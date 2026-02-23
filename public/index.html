@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast | Premium Weather Intelligence</title>
+    <meta name="description"
+        content="Experience weather like never before with SkyCast's premium intelligence and stunning visual design.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-overlay"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <main class="app-container">
+        <header class="glass-nav">
+            <div class="logo">
+                <i class="fas fa-cloud-sun"></i>
+                <span>SkyCast</span>
+            </div>
+            <div class="date-time" id="currentDate">-- --- ----</div>
+        </header>
+
+        <section class="main-card">
+            <div class="search-box">
+                <div class="input-wrapper">
+                    <i class="fas fa-location-dot"></i>
+                    <input type="text" id="cityInput" placeholder="Enter city name..." autocomplete="off">
+                </div>
+                <button id="searchBtn" aria-label="Search weather">
+                    <i class="fas fa-magnifying-glass"></i>
+                </button>
+            </div>
+
+            <div id="loader" class="loader-container">
+                <div class="premium-loader"></div>
+            </div>
+
+            <div id="errorBox" class="error-container">
+                <i class="fas fa-circle-exclamation"></i>
+                <p id="errorMsg">City not found</p>
+            </div>
+
+            <div id="weatherDisplay" class="weather-content">
+                <div class="top-row">
+                    <div class="weather-visual">
+                        <img src="" alt="Weather Icon" id="weatherIcon" class="main-icon">
+                    </div>
+                    <div class="temp-group">
+                        <h1 class="temp" id="temp">--°</h1>
+                        <p class="description" id="description">Clear Sky</p>
+                    </div>
+                </div>
+
+                <div class="location-group">
+                    <h2 class="city" id="city">London, GB</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon h-icon">
+                            <i class="fas fa-droplet"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span>Humidity</span>
+                            <p id="humidity">--%</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon w-icon">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span>Wind Speed</span>
+                            <p id="wind">-- km/h</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon f-icon">
+                            <i class="fas fa-temperature-half"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span>Feels Like</span>
+                            <p id="feelsLike">--°C</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon p-icon">
+                            <i class="fas fa-compress"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span>Country</span>
+                            <p id="countryCode">--</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="app-footer">
+            <p>&copy; 2024 SkyCast Intelligence • Premium Experience</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

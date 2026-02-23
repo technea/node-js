@@ -1,20 +1,26 @@
 const express = require('express');
 const https = require('https');
-const app = express();
+const cors = require('cors');
+const path = require('path');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public')); // Serve static files from 'public' folder
 
-// Serve index.html at root route
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
+// API Route for weather
+app.get('/api/weather', (req, res) => {
+  const city = req.query.city;
+  if (!city) {
+    return res.status(400).json({ error: 'City is required' });
+  }
 
-
-
-app.post('/weather', (req, res) => {  
-  const city = req.body.city
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=6160f20febb47fb50bf134c7613cfbaa&units=metric`
+  const apiKey = '6160f20febb47fb50bf134c7613cfbaa';
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
   https.get(url, (response) => {
     let dataChunks = '';
@@ -28,28 +34,33 @@ app.post('/weather', (req, res) => {
         const weatherData = JSON.parse(dataChunks);
 
         if (weatherData.cod !== 200) {
-          return res.status(404).send(`<h1>City not found: ${city}</h1>`);
+          return res.status(weatherData.cod).json({
+            error: weatherData.message || 'City not found'
+          });
         }
 
-        const temp = weatherData.main.temp;
-        const weatherDes = weatherData.weather[0].description;
-        const icon = weatherData.weather[0].icon;
-        const iconUrl = `http://openweathermap.org/img/wn/${icon}@2x.png`;
-
-        res.send(`
-          <h1>Temperature in ${city}: ${temp}°C</h1>
-          <h2>Weather: ${weatherDes}</h2>
-          <img src="${iconUrl}" alt="Weather Icon">
-        `);
-      } catch {
-        res.status(500).send('<h1>Error parsing weather data</h1>');
+        // Return structured JSON
+        res.json({
+          city: weatherData.name,
+          temp: Math.round(weatherData.main.temp),
+          description: weatherData.weather[0].description,
+          icon: weatherData.weather[0].icon,
+          humidity: weatherData.main.humidity,
+          windSpeed: weatherData.wind.speed,
+          feelsLike: Math.round(weatherData.main.feels_like),
+          country: weatherData.sys.country
+        });
+      } catch (error) {
+        res.status(500).json({ error: 'Error parsing weather data' });
       }
     });
-  }).on('error', () => {
-    res.status(500).send('<h1>Unable to fetch weather data</h1>');
+  }).on('error', (err) => {
+    res.status(500).json({ error: 'Unable to fetch weather data' });
   });
 });
 
-app.listen(3000, () => {
-  console.log('Server is listening on PORT 3000');
+// Static file serving is handled by middleware above
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
