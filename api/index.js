@@ -1,24 +1,17 @@
 require('dotenv').config();
 const express = require('express');
+const serverless = require('serverless-http');
 const cors = require('cors');
 const https = require('https');
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-const path = require('path');
-
-// Serve static files (HTML, CSS, JS) from the root directory
-app.use(express.static(path.join(__dirname, '../')));
-
 // API Route
-app.get('/api/weather', (req, res) => {
+app.get('/', (req, res) => {
   const city = req.query.city;
-  if (!city) {
-    return res.status(400).json({ error: 'City is required' });
-  }
+  if (!city) return res.status(400).json({ error: 'City is required' });
 
   const apiKey = process.env.OPENWEATHER_API_KEY;
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
@@ -29,9 +22,7 @@ app.get('/api/weather', (req, res) => {
     response.on('end', () => {
       try {
         const weather = JSON.parse(data);
-        if (weather.cod !== 200) {
-          return res.status(weather.cod).json({ error: weather.message });
-        }
+        if (weather.cod !== 200) return res.status(weather.cod).json({ error: weather.message });
         res.json({
           city: weather.name,
           temp: Math.round(weather.main.temp),
@@ -46,14 +37,8 @@ app.get('/api/weather', (req, res) => {
         res.status(500).json({ error: 'Parsing error' });
       }
     });
-  }).on('error', () => {
-    res.status(500).json({ error: 'Fetch failed' });
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  }).on('error', () => res.status(500).json({ error: 'Fetch failed' }));
 });
 
 module.exports = app;
+module.exports.handler = serverless(app);
