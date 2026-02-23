@@ -67,9 +67,10 @@ async function fetchWeather(city) {
 
         // Share Content Generator
         const getShareContent = () => {
+            const shareUrl = 'https://node-js-kappa-three.vercel.app/';
             return {
-                text: `🌍 SkyCast Intelligence Report: ${data.city}\n\n🌡️ Temp: ${temp}\n☁️ Condition: ${condition}\n💧 Humidity: ${humidity}\n💨 Wind: ${wind}\n\nView live:`,
-                url: window.location.href, // This would be your live site URL
+                text: `🌍 SkyCast Intelligence Report: ${data.city}\n\n🌡️ Temp: ${temp}\n☁️ Condition: ${condition}\n💧 Humidity: ${humidity}\n💨 Wind: ${wind}\n\nView live: ${shareUrl}`,
+                url: shareUrl,
                 icon: iconUrl
             };
         };
@@ -79,14 +80,14 @@ async function fetchWeather(city) {
             const content = getShareContent();
             navigator.clipboard.writeText(`${content.text}\n${content.icon}`).then(() => {
                 alert(`Detailed Weather Report & Icon URL copied for LinkedIn!`);
-                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://skycast-weather.example.com')}`, '_blank');
+                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(content.url)}`, '_blank');
             });
         };
 
         // Twitter Share
         twitterShare.onclick = () => {
             const content = getShareContent();
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(content.text)}&url=${encodeURIComponent('https://skycast-weather.example.com')}`;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(content.text)}&url=${encodeURIComponent(content.url)}`;
             window.open(twitterUrl, '_blank');
         };
 

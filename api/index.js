@@ -8,8 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Weather API Route
-app.get('/api/weather', (req, res) => {
+// API Route
+app.get('/weather', (req, res) => {
   const city = req.query.city;
   if (!city) {
     return res.status(400).json({ error: 'City is required' });
