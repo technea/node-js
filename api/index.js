@@ -1,37 +1,14 @@
 require('dotenv').config();
 const express = require('express');
-const serverless = require('serverless-http');
-const https = require('https');
 const cors = require('cors');
-
-const path = require('path');
+const https = require('https');
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from root
-app.use(express.static(path.join(__dirname, '..')));
-
-// Root Route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'index.html'));
-});
-
-app.get('/api/debug', (req, res) => {
-  const fs = require('fs');
-  res.json({
-    cwd: process.cwd(),
-    dirname: __dirname,
-    files: fs.readdirSync(process.cwd()),
-    parentFiles: fs.readdirSync(path.join(process.cwd(), '..'))
-  });
-});
-
-// API Route
+// Weather API Route
 app.get('/api/weather', (req, res) => {
   const city = req.query.city;
   if (!city) {
@@ -43,16 +20,13 @@ app.get('/api/weather', (req, res) => {
 
   https.get(url, (response) => {
     let data = '';
-
     response.on('data', chunk => data += chunk);
     response.on('end', () => {
       try {
         const weather = JSON.parse(data);
-
         if (weather.cod !== 200) {
           return res.status(weather.cod).json({ error: weather.message });
         }
-
         res.json({
           city: weather.name,
           temp: Math.round(weather.main.temp),
@@ -72,6 +46,4 @@ app.get('/api/weather', (req, res) => {
   });
 });
 
-// ⭐ Vercel serverless export
 module.exports = app;
-module.exports.handler = serverless(app);
