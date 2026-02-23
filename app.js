@@ -1,19 +1,17 @@
 require('dotenv').config();
 const express = require('express');
+const serverless = require('serverless-http');
 const https = require('https');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public')); // Serve static files from 'public' folder
 
-// API Route for weather
+// API Route
 app.get('/api/weather', (req, res) => {
   const city = req.query.city;
   if (!city) {
@@ -24,44 +22,36 @@ app.get('/api/weather', (req, res) => {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
   https.get(url, (response) => {
-    let dataChunks = '';
+    let data = '';
 
-    response.on('data', (chunk) => {
-      dataChunks += chunk;
-    });
-
+    response.on('data', chunk => data += chunk);
     response.on('end', () => {
       try {
-        const weatherData = JSON.parse(dataChunks);
+        const weather = JSON.parse(data);
 
-        if (weatherData.cod !== 200) {
-          return res.status(weatherData.cod).json({
-            error: weatherData.message || 'City not found'
-          });
+        if (weather.cod !== 200) {
+          return res.status(weather.cod).json({ error: weather.message });
         }
 
-        // Return structured JSON
         res.json({
-          city: weatherData.name,
-          temp: Math.round(weatherData.main.temp),
-          description: weatherData.weather[0].description,
-          icon: weatherData.weather[0].icon,
-          humidity: weatherData.main.humidity,
-          windSpeed: weatherData.wind.speed,
-          feelsLike: Math.round(weatherData.main.feels_like),
-          country: weatherData.sys.country
+          city: weather.name,
+          temp: Math.round(weather.main.temp),
+          description: weather.weather[0].description,
+          icon: weather.weather[0].icon,
+          humidity: weather.main.humidity,
+          windSpeed: weather.wind.speed,
+          feelsLike: Math.round(weather.main.feels_like),
+          country: weather.sys.country
         });
-      } catch (error) {
-        res.status(500).json({ error: 'Error parsing weather data' });
+      } catch {
+        res.status(500).json({ error: 'Parsing error' });
       }
     });
-  }).on('error', (err) => {
-    res.status(500).json({ error: 'Unable to fetch weather data' });
+  }).on('error', () => {
+    res.status(500).json({ error: 'Fetch failed' });
   });
 });
 
-// Static file serving is handled by middleware above
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// ⭐ Vercel serverless export
+module.exports = app;
+module.exports.handler = serverless(app);
