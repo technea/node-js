@@ -13,9 +13,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from the "public" directory (for local development)
-app.use(express.static(path.join(__dirname, '..', 'public')));
-
 // API Route
 app.get('/api/weather', (req, res) => {
   const city = req.query.city;
