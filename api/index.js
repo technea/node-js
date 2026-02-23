@@ -18,7 +18,17 @@ app.use(express.static(path.join(__dirname, '..')));
 
 // Root Route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  res.sendFile(path.join(process.cwd(), 'index.html'));
+});
+
+app.get('/api/debug', (req, res) => {
+  const fs = require('fs');
+  res.json({
+    cwd: process.cwd(),
+    dirname: __dirname,
+    files: fs.readdirSync(process.cwd()),
+    parentFiles: fs.readdirSync(path.join(process.cwd(), '..'))
+  });
 });
 
 // API Route
