@@ -8,8 +8,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const path = require('path');
+
+// Serve static files (HTML, CSS, JS) from the root directory
+app.use(express.static(path.join(__dirname, '../')));
+
 // API Route
-app.get('/weather', (req, res) => {
+app.get('/api/weather', (req, res) => {
   const city = req.query.city;
   if (!city) {
     return res.status(400).json({ error: 'City is required' });
@@ -44,6 +49,11 @@ app.get('/weather', (req, res) => {
   }).on('error', () => {
     res.status(500).json({ error: 'Fetch failed' });
   });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 module.exports = app;
