@@ -115,7 +115,7 @@ cityInput.addEventListener('keypress', (e) => {
     }
 });
 
-// Initial load
+// Initial loaded
 window.addEventListener('load', () => {
     updateDate();
     fetchWeather('London');
