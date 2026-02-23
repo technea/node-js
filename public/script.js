@@ -15,6 +15,8 @@ const windEl = document.getElementById('wind');
 const feelsLikeEl = document.getElementById('feelsLike');
 const countryCodeEl = document.getElementById('countryCode');
 const iconEl = document.getElementById('weatherIcon');
+const linkedinShare = document.getElementById('linkedinShare');
+const twitterShare = document.getElementById('twitterShare');
 
 // Update Date
 function updateDate() {
@@ -41,20 +43,53 @@ async function fetchWeather(city) {
         }
 
         // Populate Data
-        tempEl.textContent = `${data.temp}°`;
-        cityEl.textContent = `${data.city}, ${data.country}`;
-        descEl.textContent = data.description;
-        humidityEl.textContent = `${data.humidity}%`;
-        windEl.textContent = `${data.windSpeed} km/h`;
-        feelsLikeEl.textContent = `${data.feelsLike}°C`;
+        const temp = `${data.temp}°`;
+        const location = `${data.city}, ${data.country}`;
+        const condition = data.description;
+        const humidity = `${data.humidity}%`;
+        const wind = `${data.windSpeed} km/h`;
+        const feelsLike = `${data.feelsLike}°C`;
+        const iconUrl = `https://openweathermap.org/img/wn/${data.icon}@4x.png`;
+
+        tempEl.textContent = temp;
+        cityEl.textContent = location;
+        descEl.textContent = condition;
+        humidityEl.textContent = humidity;
+        windEl.textContent = wind;
+        feelsLikeEl.textContent = feelsLike;
         countryCodeEl.textContent = data.country;
 
-        // Use high-quality icons
-        iconEl.src = `https://openweathermap.org/img/wn/${data.icon}@4x.png`;
-        iconEl.alt = data.description;
+        iconEl.src = iconUrl;
+        iconEl.alt = condition;
 
         // Show UI with animation
         weatherDisplay.classList.add('active');
+
+        // Share Content Generator
+        const getShareContent = () => {
+            return {
+                text: `🌍 SkyCast Intelligence Report: ${data.city}\n\n🌡️ Temp: ${temp}\n☁️ Condition: ${condition}\n💧 Humidity: ${humidity}\n💨 Wind: ${wind}\n\nView live:`,
+                url: window.location.href, // This would be your live site URL
+                icon: iconUrl
+            };
+        };
+
+        // LinkedIn Share
+        linkedinShare.onclick = () => {
+            const content = getShareContent();
+            navigator.clipboard.writeText(`${content.text}\n${content.icon}`).then(() => {
+                alert(`Detailed Weather Report & Icon URL copied for LinkedIn!`);
+                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://skycast-weather.example.com')}`, '_blank');
+            });
+        };
+
+        // Twitter Share
+        twitterShare.onclick = () => {
+            const content = getShareContent();
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(content.text)}&url=${encodeURIComponent('https://skycast-weather.example.com')}`;
+            window.open(twitterUrl, '_blank');
+        };
+
     } catch (err) {
         loader.style.display = 'none';
         errorMsg.textContent = 'Network error. Please try again.';
